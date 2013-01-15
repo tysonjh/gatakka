@@ -26,7 +26,7 @@ object GateAkkaBuild extends Build {
     file("cluster-manager"),
     settings = Dependency.commonSettings ++
       Seq(resolvers := Dependency.resolvers,
-        libraryDependencies ++= Dependency.clusterManagerDep))
+        libraryDependencies ++= Dependency.clusterManagerDep)) dependsOn(gateactor)
 }
 
 object Dependency {
