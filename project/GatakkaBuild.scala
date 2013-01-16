@@ -12,21 +12,21 @@ object GateAkkaBuild extends Build {
     "gate-akka",
     file("."),
     settings = Dependency.commonSettings,
-    aggregate = Seq(gateactor, clustermanager))
+    aggregate = Seq(gator, luster))
 
-  lazy val gateactor = Project(
-    "gate-actor",
-    file("gate-actor"),
+  lazy val gator = Project(
+    "gator",
+    file("gator"),
     settings = Dependency.commonSettings ++
       Seq(resolvers:= Dependency.resolvers,
-        libraryDependencies ++= Dependency.gateactorDep))
+        libraryDependencies ++= Dependency.gatorDep))
 
-  lazy val clustermanager = Project(
-    "cluster-manager",
-    file("cluster-manager"),
+  lazy val luster = Project(
+    "luster",
+    file("luster"),
     settings = Dependency.commonSettings ++
       Seq(resolvers := Dependency.resolvers,
-        libraryDependencies ++= Dependency.clusterManagerDep)) dependsOn(gateactor)
+        libraryDependencies ++= Dependency.lusterDep)) dependsOn(gator)
 }
 
 object Dependency {
@@ -48,14 +48,14 @@ object Dependency {
     "ch.qos.logback" % "logback-classic" % "1.0.9"
   )
 
-  lazy val gateactorDep = commonDep ++ Seq(
+  lazy val gatorDep = commonDep ++ Seq(
     "uk.ac.gate" % "gate-core" % "7.1",
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-actor" % "2.1.0"
   )
 
-  lazy val clusterManagerDep = commonDep ++ Seq(
+  lazy val lusterDep = commonDep ++ Seq(
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-actor" % "2.1.0"
