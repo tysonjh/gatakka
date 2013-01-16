@@ -7,7 +7,7 @@ import Keys._
  * Time: 3:36 PM
  */
 
-object GateAkkaBuild extends Build {
+object GatakkaBuild extends Build {
   lazy val gateakka = Project (
     "gate-akka",
     file("."),
