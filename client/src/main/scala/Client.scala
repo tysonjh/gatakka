@@ -16,10 +16,6 @@ object Client {
   def main(args: Array[String]): Unit = {
     val annotations: Set[String] = Set("Person", "Place", "Organization")
 
-    // Override the configuration of the port
-    // when specified as program argument
-    if (args.nonEmpty) System.setProperty("akka.remote.netty.port", args(0))
-
     val system = ActorSystem("GateCluster")
     val clientActor = system.actorOf(Props[ClientActor], name = "clientactor")
     val gator = system.actorOf(Props[Gator].withRouter(FromConfig), name = "router")
@@ -32,7 +28,7 @@ object Client {
     // Main loop
     consoleLoop(annotations, gator, clientActor, system)
 
-    log.info("Exiting")
+    log.debug("Exiting")
     system.shutdown()
     sys.exit(0)
   }

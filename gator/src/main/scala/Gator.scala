@@ -19,8 +19,9 @@ class Gator extends Actor with ActorLogging {
 
   def receive = LoggingReceive {
     case in:String =>
-      log.info("Received message")
-      // do pipeline
+      log.debug("Received message")
+      Console.println("Received a message: " + in)
+
       router.tell(in, sender)
 
     case _ =>

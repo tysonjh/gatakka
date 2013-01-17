@@ -52,13 +52,15 @@ object Dependency {
     "uk.ac.gate" % "gate-core" % "7.1",
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-cluster-experimental" % "2.1.0",
-    "com.typesafe.akka" %% "akka-remote" % "2.1.0"
+    "com.typesafe.akka" %% "akka-remote" % "2.1.0",
+    "com.typesafe.akka" %% "akka-slf4j" % "2.1.0"
   )
 
   lazy val clientDep = commonDep ++ Seq(
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-cluster-experimental" % "2.1.0",
-    "com.typesafe.akka" %% "akka-remote" % "2.1.0"
+    "com.typesafe.akka" %% "akka-remote" % "2.1.0",
+    "com.typesafe.akka" %% "akka-slf4j" % "2.1.0"
   )
 
 }

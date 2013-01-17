@@ -16,17 +16,17 @@ import akka.cluster.ClusterEvent.UnreachableMember
 class ClientActor extends Actor with ActorLogging {
   def receive = {
     case state: CurrentClusterState ⇒
-      log.info("Current members: {}", state.members)
+      log.debug("Current members: {}", state.members)
     case MemberJoined(member) ⇒
-      log.info("Member joined: {}", member)
+      log.debug("Member joined: {}", member)
     case MemberUp(member) ⇒
-      log.info("Member is Up: {}", member)
+      log.debug("Member is Up: {}", member)
     case UnreachableMember(member) ⇒
-      log.info("Member detected as unreachable: {}", member)
+      log.debug("Member detected as unreachable: {}", member)
     case GatorResult(e) =>
       e match {
         case Left(ex) =>
-          log.info("Received error from Gator: {}", ex.getMessage)
+          log.warning("Received error from Gator: {}", ex.getMessage)
         case Right(r) =>
           log.info("Received result from Gator")
           Console.println(r)

@@ -15,8 +15,11 @@ class GatorWorker extends Actor with ActorLogging {
 
   def receive = LoggingReceive {
     case in: String =>
-      log.info("Received string to process")
+      Console.println("Processing message")
+      log.debug("Received string to process")
+
       // TODO: annie processing
+
       sender ! GatorResult(Right("GatorWorker likes"))
 
     case ReceiveTimeout =>
