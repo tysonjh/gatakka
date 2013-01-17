@@ -14,6 +14,7 @@ Starting the terminal input loop and cluster seeds
 From the terminal you can enter a sentence for ANNIE, 'q' for quit.
 
 Starting the Gator workers
+
 1. sbt/sbt
 2. sbt> project gator
 3. sbt> run-main Gator 54321
