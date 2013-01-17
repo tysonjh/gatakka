@@ -13,7 +13,7 @@ import akka.cluster.ClusterEvent.UnreachableMember
  * Time: 12:16 PM
  * 
  */
-class Terminactor extends Actor with ActorLogging {
+class ClientActor extends Actor with ActorLogging {
   def receive = {
     case state: CurrentClusterState ⇒
       log.info("Current members: {}", state.members)

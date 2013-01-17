@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
  * Date: 1/15/13
  * Time: 4:49 PM
  */
-object TerminalController {
+object Client {
   val log = LoggerFactory.getLogger("gatakka")
 
   def main(args: Array[String]): Unit = {
@@ -19,13 +19,17 @@ object TerminalController {
     // when specified as program argument
     if (args.nonEmpty) System.setProperty("akka.remote.netty.port", args(0))
 
-    val system = ActorSystem("LusterCluster")
-    val terminactor = system.actorOf(Props[Terminactor], name = "terminactor")
+    val system = ActorSystem("GateCluster")
+    val clientActor = system.actorOf(Props[ClientActor], name = "clientactor")
 
-    Cluster(system).subscribe(terminactor, classOf[ClusterDomainEvent])
+    Cluster(system).subscribe(clientActor, classOf[ClusterDomainEvent])
 
     // Main loop
-    consoleLoop(annotations, terminactor, system)
+    consoleLoop(annotations, clientActor, system)
+
+    log.info("Exiting")
+    system.shutdown()
+    sys.exit(0)
   }
 
   def consoleLoop(annots: Set[String], from: ActorRef, system: ActorSystem) = {
@@ -45,14 +49,14 @@ object TerminalController {
 
         case sentence if sentence.trim.size > 0 =>
           try {
-            val gator = system.actorFor("/gator/router")
+            val gator = system.actorFor("akka://GateCluster@127.0.0.1:54321/user/gator")
             log.debug("Looked up gator: {}", gator.path)
 
             Console.println("Sending to gator")
             gator.tell(sentence, from)
           } catch {
             case m: MalformedURLException =>
-              Console.println("Gator actor not started")
+              Console.println("Gator not started")
             case e: Exception =>
               Console.println("Error {}, if continues exit with \'q\'", e.getMessage)
           }
@@ -61,10 +65,5 @@ object TerminalController {
           Console.println("Try again")
       }
     }
-
-
-    log.info("Exiting")
-    system.shutdown()
-    sys.exit(0)
   }
 }

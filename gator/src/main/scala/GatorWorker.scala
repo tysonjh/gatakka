@@ -13,18 +13,22 @@ import java.util.concurrent.TimeoutException
 class GatorWorker extends Actor with ActorLogging {
   val annie = null // TODO: put GATE annie here
 
+  override def preStart() = {
+    log.info("Started actor: {}", context.self.path)
+  }
+
   def receive = LoggingReceive {
     case in: String =>
-      log.debug("Received string to process")
+      log.info("Received string to process")
       // TODO: annie processing
       sender ! GatorResult(Right("GatorWorker likes"))
 
     case ReceiveTimeout =>
-      log.debug("Received timeout")
+      log.error("Received timeout")
       sender ! GatorResult(Left(new TimeoutException("GatorWorker received a timeout")))
 
     case _ =>
-      log.debug("Received unknown message")
+      log.error("Received unknown message")
       sender ! GatorResult(Left(new Exception("GatorWorker no like")))
   }
 

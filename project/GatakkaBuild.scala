@@ -12,7 +12,7 @@ object GatakkaBuild extends Build {
     "gate-akka",
     file("."),
     settings = Dependency.commonSettings,
-    aggregate = Seq(gator, luster))
+    aggregate = Seq(gator, client))
 
   lazy val gator = Project(
     "gator",
@@ -21,12 +21,12 @@ object GatakkaBuild extends Build {
       Seq(resolvers:= Dependency.resolvers,
         libraryDependencies ++= Dependency.gatorDep))
 
-  lazy val luster = Project(
-    "luster",
-    file("luster"),
+  lazy val client = Project(
+    "client",
+    file("client"),
     settings = Dependency.commonSettings ++
       Seq(resolvers := Dependency.resolvers,
-        libraryDependencies ++= Dependency.lusterDep)) dependsOn(gator)
+        libraryDependencies ++= Dependency.clientDep)) dependsOn(gator)
 }
 
 object Dependency {
@@ -55,7 +55,7 @@ object Dependency {
     "com.typesafe.akka" %% "akka-remote" % "2.1.0"
   )
 
-  lazy val lusterDep = commonDep ++ Seq(
+  lazy val clientDep = commonDep ++ Seq(
     "com.typesafe.akka" %% "akka-actor" % "2.1.0",
     "com.typesafe.akka" %% "akka-cluster-experimental" % "2.1.0",
     "com.typesafe.akka" %% "akka-remote" % "2.1.0"

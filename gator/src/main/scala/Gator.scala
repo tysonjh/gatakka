@@ -1,4 +1,5 @@
 import akka.actor.{ActorSystem, Props, ActorLogging, Actor}
+import akka.event.LoggingReceive
 import akka.routing.FromConfig
 
 /**
@@ -16,14 +17,18 @@ case class GatorResult(output: Either[Throwable, String]) extends GatorMessage
 class Gator extends Actor with ActorLogging {
   val router = context.actorOf(Props[GatorWorker].withRouter(FromConfig), name = "router")
 
-  def receive = {
+  override def preStart() = {
+    log.info("Started actor: {}", context.self.path)
+  }
+
+  def receive = LoggingReceive {
     case in:String =>
-      log.debug("Received message")
+      log.info("Received message")
       // do pipeline
       router.tell(in, sender)
 
     case _ =>
-      log.warning("Received unknown message type")
+      log.error("Received unknown message type")
       sender ! GatorResult(Left(new Exception("Gator received unknown message")))
   }
 }
@@ -32,9 +37,13 @@ object Gator {
   def main(args: Array[String]): Unit = {
     if (args.nonEmpty) System.setProperty("akka.remote.netty.port", args(0))
 
-    val system = ActorSystem("LusterCluster")
+    val system = ActorSystem("GateCluster")
 
     system.actorOf(Props[GatorWorker], name = "worker")
-    system.actorOf(Props[Gator], name = "gator")
+    val gator = system.actorOf(Props[Gator], name = "gator")
+
+    Console.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + gator.path)
+    //#start-router-lookup
   }
 }
+
