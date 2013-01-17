@@ -1,8 +1,7 @@
 # gatakka
 ***
 
-## G.A.T.E. and Akka together
-
+### G.A.T.E. and Akka together
 An Akka cluster system with a client, cluster aware routers and G.A.T.E. processors.
 
 ### Running instructions:
