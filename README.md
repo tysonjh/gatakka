@@ -1,3 +1,4 @@
+<p>
 gatakka
 ========
 
@@ -18,3 +19,4 @@ Starting the Gator workers
 3. sbt> run-main Gator 54321
 
 Currently you MUST use port 54321 or change the Client object, or application.conf to reflect a different port.
+</p>
