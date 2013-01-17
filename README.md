@@ -19,7 +19,7 @@ An Akka cluster system with a client, cluster aware routers and G.A.T.E. process
 
 1. sbt/sbt
 2. sbt> project client
-3. sbt> run-main Client 7373
+3. sbt> run-main Client
 
 Once the client is running you can enter sentences into the terminal for GATE to process, or `q` to quit.
 
