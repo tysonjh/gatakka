@@ -9,7 +9,7 @@ Starting the terminal input loop and cluster seeds
 
 1. sbt/sbt
 2. sbt> project client
-3. sbt> run-main run-main Client 7373
+3. sbt> run-main Client 7373
 
 From the terminal you can enter a sentence for ANNIE, 'q' for quit.
 
