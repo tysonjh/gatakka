@@ -17,10 +17,6 @@ case class GatorResult(output: Either[Throwable, String]) extends GatorMessage
 class Gator extends Actor with ActorLogging {
   val router = context.actorOf(Props[GatorWorker].withRouter(FromConfig), name = "router")
 
-  override def preStart() = {
-    log.info("Started actor: {}", context.self.path)
-  }
-
   def receive = LoggingReceive {
     case in:String =>
       log.info("Received message")
@@ -40,10 +36,9 @@ object Gator {
     val system = ActorSystem("GateCluster")
 
     system.actorOf(Props[GatorWorker], name = "worker")
-    val gator = system.actorOf(Props[Gator], name = "gator")
-
-    Console.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>> " + gator.path)
-    //#start-router-lookup
+    system.actorOf(Props[Gator], name = "gator")
+    //start-router-lookup
   }
 }
+
 
