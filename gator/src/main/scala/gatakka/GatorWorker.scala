@@ -1,3 +1,5 @@
+package gatakka
+
 import akka.actor._
 import akka.event.LoggingReceive
 import java.util.concurrent.TimeoutException
@@ -13,10 +15,15 @@ import java.util.concurrent.TimeoutException
 class GatorWorker extends Actor with ActorLogging {
   val annie = null // TODO: put GATE annie here
 
+  override def preStart() = {
+    log.info("Started actor {}", self.path.name)
+
+
+  }
+
   def receive = LoggingReceive {
     case in: String =>
-      Console.println("Processing message")
-      log.debug("Received string to process")
+      log.debug("Received '{}' to process in actor {}", Array(in, self.path.name))
 
       // TODO: annie processing
 
@@ -31,15 +38,4 @@ class GatorWorker extends Actor with ActorLogging {
       sender ! GatorResult(Left(new Exception("GatorWorker no like")))
   }
 
-}
-
-// Lets see if we can add another worker to the router
-object GatorWorker {
-  def main(args: Array[String]): Unit = {
-    if (args.nonEmpty) System.setProperty("akka.remote.netty.port", args(0))
-
-    val system = ActorSystem("GateCluster")
-
-    system.actorOf(Props[GatorWorker], name = "worker")
-  }
 }

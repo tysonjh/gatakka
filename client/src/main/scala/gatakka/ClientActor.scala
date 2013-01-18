@@ -1,9 +1,11 @@
+package gatakka
 import akka.actor.{Actor, ActorLogging}
 import akka.cluster.ClusterEvent._
 import akka.cluster.ClusterEvent.CurrentClusterState
 import akka.cluster.ClusterEvent.MemberJoined
 import akka.cluster.ClusterEvent.MemberUp
 import akka.cluster.ClusterEvent.UnreachableMember
+import akka.event.LoggingReceive
 
 /**
  *
@@ -14,7 +16,7 @@ import akka.cluster.ClusterEvent.UnreachableMember
  * 
  */
 class ClientActor extends Actor with ActorLogging {
-  def receive = {
+  def receive = LoggingReceive {
     case state: CurrentClusterState ⇒
       log.debug("Current members: {}", state.members)
     case MemberJoined(member) ⇒
@@ -28,8 +30,8 @@ class ClientActor extends Actor with ActorLogging {
         case Left(ex) =>
           log.warning("Received error from Gator: {}", ex.getMessage)
         case Right(r) =>
-          log.info("Received result from Gator")
-          Console.println(r)
+          log.info("Received result from Gator: " + r)
+          Console.println("Result: " + r)
       }
     case _: ClusterDomainEvent ⇒ // ignore
 
