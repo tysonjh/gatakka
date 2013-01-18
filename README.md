@@ -19,7 +19,7 @@ An Akka cluster system with a client, cluster aware routers and G.A.T.E. process
 
 1. sbt/sbt
 2. sbt> project client
-3. sbt> run-main Client
+3. sbt> run-main gatakka.Client
 
 Once the client is running enter sentences into the terminal for GATE to process, or `q` to quit.
 
@@ -27,7 +27,7 @@ Once the client is running enter sentences into the terminal for GATE to process
 
 1. sbt/sbt
 2. sbt> project gator
-3. sbt> run-main Gator
+3. sbt> run-main gatakka.Gator
 
 #### Logging
 SLF4J with Logback is used for logging into the project directory. The client will write into client.log and the
