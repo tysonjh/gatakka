@@ -4,6 +4,9 @@
 ### G.A.T.E. and Akka together
 An Akka cluster system with a client, cluster aware routers and G.A.T.E. processors.
 
+### Current status
+2013/01/18 - Akka is up and working in a primitive form, still no presence of GATE beyond the jars.
+
 ### Running instructions:
 1. Start the client
   The client will start up the Akka cluster and provide a terminal for commands. Enter `q` to quit,
