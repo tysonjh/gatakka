@@ -27,7 +27,7 @@ Once the client is running enter sentences into the terminal for GATE to process
 3. sbt> run-main Gator
 
 #### Logging
-SLF4J with Logback are used for logging into the project directory. The client will write into client.log and the
+SLF4J with Logback is used for logging into the project directory. The client will write into client.log and the
 workers will write into gator.log. By default it is very verbose with DEBUG logging levels. If you are not so
 interested in seeing cluster membership and actor LoggingReceive style messages change the log level to INFO.
 
