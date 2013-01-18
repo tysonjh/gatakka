@@ -10,10 +10,7 @@ An Akka cluster system with a client, cluster aware routers and G.A.T.E. process
   or enter a sentence for ANNIE to process.
 
 2. Start at least one Gator
-  Gator will start a router and single GATE worker.
-
-3. Optionally start multiple GatorWorker
-  GatorWorker joins the routers providing more workers for processing jobs.
+  Gator will start a router and 3 GATE workers by default.
 
 #### Client
 
@@ -21,7 +18,7 @@ An Akka cluster system with a client, cluster aware routers and G.A.T.E. process
 2. sbt> project client
 3. sbt> run-main Client
 
-Once the client is running you can enter sentences into the terminal for GATE to process, or `q` to quit.
+Once the client is running enter sentences into the terminal for GATE to process, or `q` to quit.
 
 #### Gator (GATE Router / Workers)
 
@@ -29,8 +26,8 @@ Once the client is running you can enter sentences into the terminal for GATE to
 2. sbt> project gator
 3. sbt> run-main Gator
 
-#### Workers
+#### Logging
+SLF4J with Logback are used for logging into the project directory. The client will write into client.log and the
+workers will write into gator.log. By default it is very verbose with DEBUG logging levels. If you are not so
+interested in seeing cluster membership and actor LoggingReceive style messages change the log level to INFO.
 
-1. sbt/sbt
-2. sbt> project gator
-3. sbt> run-main GatorWorker
