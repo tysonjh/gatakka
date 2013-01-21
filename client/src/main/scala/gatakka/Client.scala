@@ -4,13 +4,7 @@ import akka.cluster.Cluster
 import akka.cluster.ClusterEvent._
 import akka.routing.FromConfig
 import java.net.MalformedURLException
-import org.slf4j.LoggerFactory
 
-/**
- * User: tysonjh
- * Date: 1/15/13
- * Time: 4:49 PM
- */
 object Client {
   def main(args: Array[String]): Unit = {
     val annotations: Set[String] = Set("Person", "Place", "Organization")
