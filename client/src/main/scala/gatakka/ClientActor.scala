@@ -7,14 +7,6 @@ import akka.cluster.ClusterEvent.MemberUp
 import akka.cluster.ClusterEvent.UnreachableMember
 import akka.event.LoggingReceive
 
-/**
- *
- * Organization: VerticalScope Inc.
- * User: Tyson Hamilton (thamilton@verticalscope.com)
- * Date: 16/01/13
- * Time: 12:16 PM
- * 
- */
 class ClientActor extends Actor with ActorLogging {
   def receive = LoggingReceive {
     case state: CurrentClusterState ⇒
@@ -31,7 +23,7 @@ class ClientActor extends Actor with ActorLogging {
           log.warning("Received error from Gator: {}", ex.getMessage)
         case Right(r) =>
           log.info("Received result from Gator: " + r)
-          Console.println("Result: " + r)
+          Console.println("Result received from actor %s: %s".format(sender.path.name, r))
       }
     case _: ClusterDomainEvent ⇒ // ignore
 
