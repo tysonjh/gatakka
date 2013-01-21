@@ -3,31 +3,32 @@ package gatakka
 import akka.actor._
 import akka.event.LoggingReceive
 import java.util.concurrent.TimeoutException
+import org.junit.runners.model.InitializationError
 
-/**
- *
- * Organization: VerticalScope Inc.
- * User: Tyson Hamilton (thamilton@verticalscope.com)
- * Date: 16/01/13
- * Time: 12:01 PM
- * 
- */
 class GatorWorker extends Actor with ActorLogging {
-  val annie = null // TODO: put GATE annie here
+  private var annie: Option[Annie] = None
 
   override def preStart() = {
     log.info("Started actor {}", self.path.name)
 
+    GateFactory.init
+    annie = Some(new Annie())
 
+    annie match {
+      case Some(a) => a.init
+      case None => throw new InitializationError("Could not initialize ANNIE")
+    }
   }
 
   def receive = LoggingReceive {
-    case in: String =>
+    case in: String if annie.isDefined =>
       log.debug("Received '{}' to process in actor {}", Array(in, self.path.name))
+      val annots = annie.get.execute(in)
+      sender ! GatorResult(Right(GateUtils.annotationListprettyPrint(annots, in)))
 
-      // TODO: annie processing
-
-      sender ! GatorResult(Right("GatorWorker likes"))
+    case in: String =>
+      log.error("Annie is not initialized")
+      sender ! GatorResult(Left(new InitializationError("Annie is not initialized")))
 
     case ReceiveTimeout =>
       log.error("Received timeout")
