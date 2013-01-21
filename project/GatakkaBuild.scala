@@ -1,11 +1,7 @@
 import sbt._
 import Keys._
-
-/**
- * User: tysonjh
- * Date: 1/15/13
- * Time: 3:36 PM
- */
+import com.typesafe.sbt.SbtMultiJvm
+import com.typesafe.sbt.SbtMultiJvm.MultiJvmKeys.MultiJvm
 
 object GatakkaBuild extends Build {
   lazy val gateakka = Project (
@@ -19,14 +15,14 @@ object GatakkaBuild extends Build {
     file("gator"),
     settings = Dependency.commonSettings ++
       Seq(resolvers:= Dependency.resolvers,
-        libraryDependencies ++= Dependency.gatorDep))
+        libraryDependencies ++= Dependency.gatorDep)) configs(MultiJvm)
 
   lazy val client = Project(
     "client",
     file("client"),
     settings = Dependency.commonSettings ++
       Seq(resolvers := Dependency.resolvers,
-        libraryDependencies ++= Dependency.clientDep)) dependsOn(gator)
+        libraryDependencies ++= Dependency.clientDep)) configs(MultiJvm) dependsOn(gator)
 }
 
 object Dependency {
@@ -38,29 +34,44 @@ object Dependency {
     "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
   )
 
-  lazy val commonSettings = Defaults.defaultSettings ++ Seq(
+  lazy val commonSettings = Defaults.defaultSettings ++ multiJvmSettings ++ Seq(
     organization := "com.tysonhamilton",
     version := "0.1",
-    scalaVersion := scalaVer
+    scalaVersion := scalaVer,
+    crossPaths   := false
+  )
+
+  lazy val multiJvmSettings = SbtMultiJvm.multiJvmSettings ++ Seq(
+    compile in MultiJvm <<= (compile in MultiJvm) triggeredBy (compile in Test),
+    parallelExecution in Test := false,
+    executeTests in Test <<=
+      ((executeTests in Test), (executeTests in MultiJvm)) map {
+        case ((_, testResults), (_, multiJvmResults))  =>
+          val results = testResults ++ multiJvmResults
+          (Tests.overall(results.values), results)
+      }
   )
 
   lazy val commonDep = Seq(
-    "ch.qos.logback" % "logback-classic" % "1.0.9"
+    "ch.qos.logback" % "logback-classic" % "1.0.9",
+  // -- Akka dependencies
+    "com.typesafe.akka" %% "akka-actor" % akkaVer,
+    "com.typesafe.akka" %% "akka-cluster-experimental" % akkaVer,
+    "com.typesafe.akka" %% "akka-remote" % akkaVer,
+    "com.typesafe.akka" %% "akka-slf4j" % akkaVer,
+  // -- Akka test dependencies
+    "com.typesafe.akka" %% "akka-testkit" % akkaVer % "test" ,
+    "com.typesafe.akka" %% "akka-remote-tests-experimental" % akkaVer % "test" ,
+    "org.scalatest" %% "scalatest" % "1.9" % "test",
+    "junit" % "junit" % "4.5" % "test"
   )
 
   lazy val gatorDep = commonDep ++ Seq(
-    "uk.ac.gate" % "gate-core" % "7.1",
-    "com.typesafe.akka" %% "akka-actor" % "2.1.0",
-    "com.typesafe.akka" %% "akka-cluster-experimental" % "2.1.0",
-    "com.typesafe.akka" %% "akka-remote" % "2.1.0",
-    "com.typesafe.akka" %% "akka-slf4j" % "2.1.0"
+    "uk.ac.gate" % "gate-core" % gateVer
   )
 
   lazy val clientDep = commonDep ++ Seq(
-    "com.typesafe.akka" %% "akka-actor" % "2.1.0",
-    "com.typesafe.akka" %% "akka-cluster-experimental" % "2.1.0",
-    "com.typesafe.akka" %% "akka-remote" % "2.1.0",
-    "com.typesafe.akka" %% "akka-slf4j" % "2.1.0"
+  // -- None currently
   )
 
 }
