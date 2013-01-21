@@ -11,6 +11,7 @@ An Akka cluster system with a client, cluster aware routers and G.A.T.E. process
 ### To-do List
 - Add testing using [multi-jvm](http://doc.akka.io/docs/akka/current/dev/multi-jvm-testing.html)
 - Stress test and profile
+- Add dispatcher for GATE processing
 
 ### Running instructions:
 1. Start the client
