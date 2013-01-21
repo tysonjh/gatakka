@@ -4,8 +4,13 @@
 ### G.A.T.E. and Akka together
 An Akka cluster system with a client, cluster aware routers and G.A.T.E. processors.
 
-### Current status
-2013/01/21 - Akka is up and working. GATE is up and working.
+### Current Status
+2013/01/21
+- Akka is up and working. GATE is up and working.
+
+### To-do List
+- Add testing using [multi-jvm](http://doc.akka.io/docs/akka/current/dev/multi-jvm-testing.html)
+- Stress test and profile
 
 ### Running instructions:
 1. Start the client
