@@ -2,7 +2,8 @@
 ***
 
 ### G.A.T.E. and Akka together
-An Akka cluster system with a client, cluster aware routers and G.A.T.E. processors.
+An [Akka cluster](http://doc.akka.io/docs/akka/current/cluster/cluster.html)
+ system with a client, cluster aware routers and [G.A.T.E.](http://gate.ac.uk) processors.
 
 ### Current Status
 2013/01/21
@@ -23,6 +24,8 @@ An Akka cluster system with a client, cluster aware routers and G.A.T.E. process
 
 #### Client
 
+From the project directory
+
 1. sbt/sbt
 2. sbt> project client
 3. sbt> run-main gatakka.Client
@@ -31,9 +34,14 @@ Once the client is running enter sentences into the terminal for GATE to process
 
 #### Gator (GATE Router / Workers)
 
+From the project directory
+
 1. sbt/sbt
 2. sbt> project gator
 3. sbt> run-main gatakka.Gator
+
+The workers can be run on the same host as the Client without any configuration changes. To run Gator on a different host
+one must change the seed-node cluster settings in the application.conf.
 
 #### Logging
 SLF4J with Logback is used for logging into the project directory. The client will write into client.log and the
