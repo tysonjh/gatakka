@@ -4,6 +4,7 @@ import akka.actor._
 import akka.actor.SupervisorStrategy.{Restart, Stop}
 import akka.event.LoggingReceive
 import akka.routing.FromConfig
+import gate.creole.ResourceInstantiationException
 
 sealed trait GatorMessage
 case class GatorResult(output: Either[Throwable, String]) extends GatorMessage
@@ -12,6 +13,10 @@ class Gator extends Actor with ActorLogging {
   val router = context.actorOf(Props[GatorWorker].withRouter(FromConfig), name = "router")
 
   override val supervisorStrategy = OneForOneStrategy () {
+    case g: ResourceInstantiationException =>
+      log.error("GatorWorker can't load GATE resource: {}", g.getMessage)
+      Stop
+
     case e: Exception =>
       log.error("GatorWorker died from {}, restarting", e.getMessage)
       Restart
