@@ -6,7 +6,7 @@ import java.util.concurrent.TimeoutException
 import org.junit.runners.model.InitializationError
 
 class GatorWorker extends Actor with ActorLogging {
-  private var annie: Option[Annie] = None
+  private [gatakka] var annie: Option[Annie] = None
 
   override def preStart() = {
     log.info("Started actor {}", self.path.name)
@@ -16,7 +16,7 @@ class GatorWorker extends Actor with ActorLogging {
 
     annie match {
       case Some(a) => a.init
-      case None => throw new InitializationError("Could not initialize ANNIE")
+      case None => throw new IllegalStateException("Could not initialize ANNIE")
     }
   }
 
@@ -28,11 +28,7 @@ class GatorWorker extends Actor with ActorLogging {
 
     case in: String =>
       log.error("Annie is not initialized")
-      sender ! GatorResult(Left(new InitializationError("Annie is not initialized")))
-
-    case ReceiveTimeout =>
-      log.error("Received timeout")
-      sender ! GatorResult(Left(new TimeoutException("GatorWorker received a timeout")))
+      sender ! GatorResult(Left(new IllegalStateException("Annie is not initialized")))
 
     case _ =>
       log.error("Received unknown message")
