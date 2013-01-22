@@ -20,8 +20,11 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
   def initialParticipants = roles.size
 
   "A Gatakka Gator" must {
-    "join the cluster" in {
+    "wait for nodes to enter a barrier" in {
+      testConductor.enter("startup")
+    }
 
+    "join the cluster" in {
       runOn(client1) {
         Cluster(system) join node(client1).address
 
@@ -33,21 +36,11 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
               allowLocalRoutees = false))),
           name = "router")
 
-        system.actorOf(Props[Gator], name = "gator")
-      }
+        val gator = system.actorOf(Props[Gator], name = "gator")
+        testConductor.enter("client-up")
 
-      testConductor.enter("client-up")
-
-      runOn(gator1) {
-        Cluster(system) join node(client1).address
-        system.actorOf(Props[Gator], name = "gator")
-      }
-
-      testConductor.enter("all-started")
-
-      runOn(client1) {
-        val gator = system.actorFor("/user/gator")
-
+        // Wait for gator to be up
+        testConductor.enter("gator-up")
         awaitCond{
           gator ! GatorStatus()
           expectMsgPF(30 seconds) {
@@ -58,7 +51,16 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
           }
         }
       }
-      testConductor.enter("all-finished")
+
+      runOn(gator1) {
+        Cluster(system) join node(client1).address
+
+        // Wait for client cluster to be up
+        testConductor.enter("client-up")
+
+        system.actorOf(Props[Gator], name = "gator")
+        testConductor.enter("gator-up")
+      }
     }
 
     "verify presence of Persons" in {
