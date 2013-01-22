@@ -25,11 +25,8 @@ object Client {
 
   def consoleLoop(annots: Set[String], to: ActorRef, from: ActorRef, system: ActorSystem) = {
     var continue = true
-    Console.println("Enter a sentence to run through the ANNIE pipeline.\n" +
-      "Results will contain a sample set of annotations.\n" +
-      "(%s)\n".format(annots.reduceLeft(_ + "," + _)) +
-      "Enter \'q\' to exit")
-
+    val verifyAnnotationRegex = """(.*)~~(.*)""".r
+    usage
     while(continue) {
       Console.print("Sentence:\n")
       val command = Console.readLine()
@@ -40,8 +37,14 @@ object Client {
 
         case sentence if sentence.trim.size > 0 =>
           try {
-            Console.println("Sending to gator")
-            to.tell(sentence, from)
+            sentence match {
+              case verifyAnnotationRegex(annot, _) =>
+                Console.println("Verifying presence of %s".format(annot))
+                to.tell(GatorVerifyPresence(annot, sentence), from)
+              case _ =>
+                Console.println("Processing sentence")
+                to.tell(GatorRequest(sentence), from)
+            }
           } catch {
             case m: MalformedURLException =>
               Console.println("Gator not started")
@@ -53,5 +56,17 @@ object Client {
           Console.println("Try again")
       }
     }
+  }
+
+  private [gatakka] def usage {
+    Console.println("Options:\n" +
+      "1. Enter a sentence for ANNIE to process\n" +
+      "\tE.g: It is cold in Toronto.\n" +
+      "2. Enter an annotation type (A~~) followed by a sentence to verify annotation presence\n" +
+      "\tE.g: Person~~Sometimes Tyson throws snowballs at children.\n" +
+      "3. Enter `q` to quit\n" +
+      "\tE.g.: q\n"
+    )
+
   }
 }
