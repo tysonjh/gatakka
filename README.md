@@ -50,6 +50,9 @@ SLF4J with Logback is used for logging into the project directory. The client wi
 workers will write into gator.log. By default it is very verbose with DEBUG logging levels. If you are not so
 interested in seeing cluster membership and actor LoggingReceive style messages change the log level to INFO.
 
+GATE uses log4j and it defaults to console so it muddles up the experience, thus a log4j.xml file directs GATE to
+log into a gate.log file.
+
 #### Sample session
 ```
 >run-main gatakka.Client
@@ -89,3 +92,8 @@ Toronto is a beautiful city, but Tyson finds it cold.
       0      7                Token              Toronto
 ```
 
+#### Notes
+ANNIE was used here just for an example, technically this code could be used for any application that uses
+a SerialAnalyserController with minor modifications. In fact this code was developed as a learning experience and
+basis for a more complex usage scenario that involves moderate (~50req/sec/node) throughput and is backed
+by NoSQL Gazetteers, a verbose JAPE grammar system and hooks up with other fun things.
