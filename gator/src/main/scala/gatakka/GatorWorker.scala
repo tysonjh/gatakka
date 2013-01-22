@@ -11,20 +11,38 @@ class GatorWorker extends Actor with ActorLogging {
   override def preStart() = {
     log.info("Started actor {}", self.path.name)
 
-    GateFactory.init
+    GateFactory.init()
     annie = Some(new Annie())
 
     annie match {
-      case Some(a) => a.init
+      case Some(a) => a.init()
       case None => throw new IllegalStateException("Could not initialize ANNIE")
     }
   }
 
+  override def postStop() {
+    annie match {
+      case Some(a) =>
+        a.clean()
+        annie = None
+      case None =>
+    }
+  }
+
   def receive = LoggingReceive {
-    case in: String if annie.isDefined =>
+    case GatorStatus() =>
+      sender ! GatorResult(Right(annie.isDefined.toString))
+
+    case GatorRequest(in) if annie.isDefined =>
       log.debug("Received '{}' to process in actor {}", Array(in, self.path.name))
       val annots = annie.get.execute(in)
       sender ! GatorResult(Right(GateUtils.annotationListprettyPrint(annots, in)))
+
+    case GatorVerifyPresence(annot, in) if annie.isDefined =>
+      log.debug("Received '{}' to process in actor {}", Array(in, self.path.name))
+
+      sender ! GatorResult(Right((annie.get.execute(in)
+          .filter(_.getType.toLowerCase.equals(annot.toLowerCase)).size > 0).toString))
 
     case in: String =>
       log.error("Annie is not initialized")
