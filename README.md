@@ -9,15 +9,17 @@ An [Akka cluster](http://doc.akka.io/docs/akka/current/cluster/cluster.html)
 2013/01/21
 - Akka is up and working. GATE is up and working.
 
+### Recent additions
+2013/01/22
+- Added basic tests for [multi-jvm](http://doc.akka.io/docs/akka/current/dev/multi-jvm-testing.html)
+
 ### To-do List
-- Add testing using [multi-jvm](http://doc.akka.io/docs/akka/current/dev/multi-jvm-testing.html)
 - Stress test and profile
-- Add dispatcher for GATE processing
+
 
 ### Running instructions:
 1. Start the client
-  The client will start up the Akka cluster and provide a terminal for commands. Enter `q` to quit,
-  or enter a sentence for ANNIE to process.
+  The client will start up the Akka cluster and display a usage guide - follow it.
 
 2. Start at least one Gator
   Gator will start a router and 3 GATE workers by default.
