@@ -18,6 +18,7 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
   import GatakkaMultiNodeConfig._
 
   def initialParticipants = roles.size
+  def cluster = Cluster(system)
 
   "A Gatakka Gator" must {
     "wait for nodes to enter a barrier" in {
@@ -26,7 +27,7 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
 
     "join the cluster" in {
       runOn(client1) {
-        Cluster(system) join node(client1).address
+        cluster join node(client1).address
 
         system.actorOf(Props[Gator].withRouter(
           ClusterRouterConfig(
@@ -53,7 +54,7 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
       }
 
       runOn(gator1) {
-        Cluster(system) join node(client1).address
+        cluster join node(client1).address
 
         // Wait for client cluster to be up
         testConductor.enter("client-up")
@@ -65,7 +66,7 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
 
     "verify presence of Persons" in {
       runOn(client1){
-        Cluster(system) join node(client1).address
+        cluster join node(client1).address
         val gator = system.actorFor("/user/gator")
 
         awaitCond{
@@ -82,7 +83,7 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
 
     "process a sentence" in {
       runOn(client1){
-        Cluster(system) join node(client1).address
+        cluster join node(client1).address
         val gator = system.actorFor("/user/gator")
 
         awaitCond{
