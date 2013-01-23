@@ -5,8 +5,12 @@ import akka.testkit.ImplicitSender
 import akka.actor.Props
 import scala.concurrent.duration._
 import akka.routing.RoundRobinRouter
-import akka.cluster.Cluster
+import akka.cluster.{Member, MemberStatus, Cluster}
 import akka.cluster.routing.{ClusterRouterConfig, ClusterRouterSettings}
+import akka.pattern.ask
+import concurrent.Await
+import akka.util.Timeout
+import akka.cluster.ClusterEvent.{CurrentClusterState, MemberUp}
 
 
 class GatorMultiJvmNode1 extends GatakkaMultiNode
@@ -17,18 +21,20 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
   with STMultiNodeSpec with ImplicitSender {
   import GatakkaMultiNodeConfig._
 
+  implicit val timeout = Timeout(20 seconds)
   def initialParticipants = roles.size
-  def cluster = Cluster(system)
 
   "A Gatakka Gator" must {
-    "wait for nodes to enter a barrier" in {
-      testConductor.enter("startup")
-    }
+    "start up the cluster" in {
+      Cluster(system).subscribe(testActor, classOf[MemberUp])
+      expectMsgClass(classOf[CurrentClusterState])
 
-    "join the cluster" in {
+      val clientAddress = node(client1).address
+      val gatorAddress = node(gator1).address
+
+      Cluster(system) join clientAddress
+
       runOn(client1) {
-        cluster join node(client1).address
-
         system.actorOf(Props[Gator].withRouter(
           ClusterRouterConfig(
             RoundRobinRouter(), ClusterRouterSettings(
@@ -37,11 +43,28 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
               allowLocalRoutees = false))),
           name = "router")
 
-        val gator = system.actorOf(Props[Gator], name = "gator")
+        system.actorOf(Props[Gator], name = "gator")
         testConductor.enter("client-up")
+      }
 
-        // Wait for gator to be up
-        testConductor.enter("gator-up")
+      runOn(gator1) {
+        testConductor.enter("client-up")
+        system.actorOf(Props[Gator], name = "gator")
+      }
+
+      expectMsgAllOf(
+        MemberUp(Member(clientAddress, MemberStatus.Up)),
+        MemberUp(Member(gatorAddress, MemberStatus.Up)))
+
+      Cluster(system).unsubscribe(testActor)
+
+      testConductor.enter("all-up")
+    }
+
+    "respond to status queries" in {
+      runOn(client1) {
+        val gator = system.actorFor("/user/gator")
+
         awaitCond{
           gator ! GatorStatus()
           expectMsgPF(30 seconds) {
@@ -52,21 +75,11 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
           }
         }
       }
-
-      runOn(gator1) {
-        cluster join node(client1).address
-
-        // Wait for client cluster to be up
-        testConductor.enter("client-up")
-
-        system.actorOf(Props[Gator], name = "gator")
-        testConductor.enter("gator-up")
-      }
+      testConductor.enter("done-test1")
     }
 
     "verify presence of Persons" in {
       runOn(client1){
-        cluster join node(client1).address
         val gator = system.actorFor("/user/gator")
 
         awaitCond{
@@ -79,11 +92,12 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
           }
         }
       }
+
+      testConductor.enter("done-test2")
     }
 
     "process a sentence" in {
       runOn(client1){
-        cluster join node(client1).address
         val gator = system.actorFor("/user/gator")
 
         awaitCond{
@@ -95,6 +109,23 @@ class GatakkaMultiNode extends MultiNodeSpec(GatakkaMultiNodeConfig)
           }
         }
       }
+
+      testConductor.enter("done-test3")
+    }
+
+    "process many many sentences quickly" in {
+      runOn(client1){
+        val gator = system.actorFor("/user/gator")
+
+        val results = for (i <- 0 to (MoPI.mopiallSentences.size - 1)) yield {
+          gator ? GatorRequest(MoPI.mopiallSentences(i))
+        }
+
+        results.map {
+          r => Await.result(r, 20 seconds)
+        }
+      }
+      testConductor.enter("done-test4")
     }
   }
 }
